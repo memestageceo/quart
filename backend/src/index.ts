@@ -1,24 +1,33 @@
-import express from 'express';
-import type { Request, Response } from 'express';
-import { randomUUID } from 'crypto';
-import { todoSchema, todoUpdateSchema, type Todo, type TodoInput, type TodoUpdate } from './types.ts';
+import express from "express";
+import type { Request, Response } from "express";
+import { randomUUID } from "crypto";
+import {
+  todoSchema,
+  todoUpdateSchema,
+  type Todo,
+  type TodoInput,
+  type TodoUpdate,
+} from "./types.ts";
+import { data } from "./data.ts";
+import cors from "cors";
 
 const app = express();
 const PORT = 3000;
 
 // Middleware
+app.use(cors());
 app.use(express.json());
 
 // In-memory storage
-let todos: Todo[] = [];
+let todos: Todo[] = data;
 
 // Helper function to find todo by id
 const findTodoById = (id: string): Todo | undefined => {
-  return todos.find(todo => todo.id === id);
+  return todos.find((todo) => todo.id === id);
 };
 
 // CREATE - POST /todos
-app.post('/todos', (req: Request, res: Response): void => {
+app.post("/todos", (req: Request, res: Response): void => {
   try {
     // Validate input with Zod
     const validatedData: TodoInput = todoSchema.parse(req.body);
@@ -34,25 +43,27 @@ app.post('/todos', (req: Request, res: Response): void => {
     res.status(201).json(newTodo);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(400).json({ error: 'Validation failed', details: error.message });
+      res
+        .status(400)
+        .json({ error: "Validation failed", details: error.message });
     } else {
-      res.status(400).json({ error: 'Validation failed' });
+      res.status(400).json({ error: "Validation failed" });
     }
   }
 });
 
 // READ ALL - GET /todos
-app.get('/todos', (_req: Request, res: Response): void => {
+app.get("/todos", (_req: Request, res: Response): void => {
   res.json(todos);
 });
 
 // READ SINGLE - GET /todos/:id
-app.get('/todos/:id', (req: Request, res: Response): void => {
+app.get("/todos/:id", (req: Request, res: Response): void => {
   const { id } = req.params;
   const todo = findTodoById(id);
 
   if (!todo) {
-    res.status(404).json({ error: 'Todo not found' });
+    res.status(404).json({ error: "Todo not found" });
     return;
   }
 
@@ -60,13 +71,13 @@ app.get('/todos/:id', (req: Request, res: Response): void => {
 });
 
 // UPDATE - PUT /todos/:id
-app.put('/todos/:id', (req: Request, res: Response): void => {
+app.put("/todos/:id", (req: Request, res: Response): void => {
   try {
     const { id } = req.params;
     const todo = findTodoById(id);
 
     if (!todo) {
-      res.status(404).json({ error: 'Todo not found' });
+      res.status(404).json({ error: "Todo not found" });
       return;
     }
 
@@ -79,25 +90,27 @@ app.put('/todos/:id', (req: Request, res: Response): void => {
     res.json(todo);
   } catch (error) {
     if (error instanceof Error) {
-      res.status(400).json({ error: 'Validation failed', details: error.message });
+      res
+        .status(400)
+        .json({ error: "Validation failed", details: error.message });
     } else {
-      res.status(400).json({ error: 'Validation failed' });
+      res.status(400).json({ error: "Validation failed" });
     }
   }
 });
 
 // DELETE - DELETE /todos/:id
-app.delete('/todos/:id', (req: Request, res: Response): void => {
+app.delete("/todos/:id", (req: Request, res: Response): void => {
   const { id } = req.params;
-  const todoIndex = todos.findIndex(todo => todo.id === id);
+  const todoIndex = todos.findIndex((todo) => todo.id === id);
 
   if (todoIndex === -1) {
-    res.status(404).json({ error: 'Todo not found' });
+    res.status(404).json({ error: "Todo not found" });
     return;
   }
 
   const deletedTodo = todos.splice(todoIndex, 1)[0];
-  res.json({ message: 'Todo deleted successfully', todo: deletedTodo });
+  res.json({ message: "Todo deleted successfully", todo: deletedTodo });
 });
 
 // Start server
