@@ -8,7 +8,7 @@ interface Todo {
 
 async function getTodos(): Promise<Todo[]> {
   try {
-    const res = await fetch("http://localhost:3000/todos", {
+    const res = await fetch("http://localhost:3001/todos", {
       cache: "no-store",
     });
 

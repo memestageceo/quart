@@ -13,7 +13,7 @@ export default function AddTodoForm() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch("http://localhost:3000/todos", {
+      const res = await fetch("http://localhost:3001/todos", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -64,10 +64,7 @@ export default function AddTodoForm() {
       </div>
 
       <div>
-        <label
-          htmlFor="description"
-          className="block text-sm font-medium mb-1"
-        >
+        <label htmlFor="description" className="block text-sm font-medium mb-1">
           Description
         </label>
         <textarea
